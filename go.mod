@@ -5,6 +5,7 @@ go 1.22.1
 require (
 	github.com/google/uuid v1.6.0
 	github.com/spf13/viper v1.18.2
+	golang.org/x/crypto v0.19.0
 )
 
 require (
@@ -24,7 +25,6 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.19.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 )

@@ -23,6 +23,8 @@ func NewServer(service db.Service) *Server {
 		v.RegisterValidation("user_role", validUserRole)
 	}
 
+	router.POST("/users", server.createUser)
+
 	// router.POST("/accounts", server.createAccount)
 	// router.GET("/accounts/:id", server.getAccount)
 	// router.GET("/accounts", server.listAccounts)
