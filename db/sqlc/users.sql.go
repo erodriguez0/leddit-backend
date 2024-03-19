@@ -13,18 +13,16 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO "users" (
     username,
-    email,
     password,
     avatar,
     role
 ) VALUES (
-    $1, $2, $3, $4, $5
-) RETURNING id, username, email, password, avatar, role, created_at, updated_at
+    $1, $2, $3, $4
+) RETURNING id, username, password, avatar, role, created_at, updated_at
 `
 
 type CreateUserParams struct {
 	Username string         `json:"username"`
-	Email    sql.NullString `json:"email"`
 	Password string         `json:"password"`
 	Avatar   sql.NullString `json:"avatar"`
 	Role     NullUserRole   `json:"role"`
@@ -33,7 +31,6 @@ type CreateUserParams struct {
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRowContext(ctx, createUser,
 		arg.Username,
-		arg.Email,
 		arg.Password,
 		arg.Avatar,
 		arg.Role,
@@ -42,7 +39,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Email,
 		&i.Password,
 		&i.Avatar,
 		&i.Role,
@@ -63,7 +59,7 @@ func (q *Queries) DeleteAccount(ctx context.Context, username string) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, email, password, avatar, role, created_at, updated_at FROM users
+SELECT id, username, password, avatar, role, created_at, updated_at FROM users
 WHERE username = $1 LIMIT 1
 `
 
@@ -73,7 +69,6 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Email,
 		&i.Password,
 		&i.Avatar,
 		&i.Role,
@@ -84,7 +79,7 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 }
 
 const getUserForUpdate = `-- name: GetUserForUpdate :one
-SELECT id, username, email, password, avatar, role, created_at, updated_at FROM users
+SELECT id, username, password, avatar, role, created_at, updated_at FROM users
 WHERE username = $1 LIMIT 1
 FOR NO KEY UPDATE
 `
@@ -95,7 +90,6 @@ func (q *Queries) GetUserForUpdate(ctx context.Context, username string) (User, 
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Email,
 		&i.Password,
 		&i.Avatar,
 		&i.Role,
@@ -106,7 +100,7 @@ func (q *Queries) GetUserForUpdate(ctx context.Context, username string) (User, 
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, username, email, password, avatar, role, created_at, updated_at FROM users
+SELECT id, username, password, avatar, role, created_at, updated_at FROM users
 ORDER BY created_at
 LIMIT $1
 OFFSET $2
@@ -129,7 +123,6 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 		if err := rows.Scan(
 			&i.ID,
 			&i.Username,
-			&i.Email,
 			&i.Password,
 			&i.Avatar,
 			&i.Role,
@@ -153,18 +146,16 @@ const updateUser = `-- name: UpdateUser :one
 UPDATE users 
 SET 
     username = COALESCE($1, username),
-    email = COALESCE($2, email),
-    password = COALESCE($3, password),
-    avatar = COALESCE($4, avatar),
-    role = COALESCE($5, role)
+    password = COALESCE($2, password),
+    avatar = COALESCE($3, avatar),
+    role = COALESCE($4, role)
 WHERE 
     username = $1
-RETURNING id, username, email, password, avatar, role, created_at, updated_at
+RETURNING id, username, password, avatar, role, created_at, updated_at
 `
 
 type UpdateUserParams struct {
 	Username sql.NullString `json:"username"`
-	Email    sql.NullString `json:"email"`
 	Password sql.NullString `json:"password"`
 	Avatar   sql.NullString `json:"avatar"`
 	Role     NullUserRole   `json:"role"`
@@ -173,7 +164,6 @@ type UpdateUserParams struct {
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
 	row := q.db.QueryRowContext(ctx, updateUser,
 		arg.Username,
-		arg.Email,
 		arg.Password,
 		arg.Avatar,
 		arg.Role,
@@ -182,7 +172,6 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
-		&i.Email,
 		&i.Password,
 		&i.Avatar,
 		&i.Role,

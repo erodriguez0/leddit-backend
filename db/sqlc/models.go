@@ -114,13 +114,14 @@ type CommentVote struct {
 }
 
 type Post struct {
-	ID        uuid.UUID      `json:"id"`
-	Title     string         `json:"title"`
-	Url       sql.NullString `json:"url"`
-	Body      sql.NullString `json:"body"`
-	UserID    uuid.NullUUID  `json:"user_id"`
-	CreatedAt sql.NullTime   `json:"created_at"`
-	UpdatedAt sql.NullTime   `json:"updated_at"`
+	ID          uuid.UUID      `json:"id"`
+	Title       string         `json:"title"`
+	Url         sql.NullString `json:"url"`
+	Body        sql.NullString `json:"body"`
+	UserID      uuid.NullUUID  `json:"user_id"`
+	SubledditID uuid.NullUUID  `json:"subleddit_id"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
 }
 
 type PostImage struct {
@@ -147,7 +148,6 @@ type Subleddit struct {
 type User struct {
 	ID        uuid.UUID      `json:"id"`
 	Username  string         `json:"username"`
-	Email     sql.NullString `json:"email"`
 	Password  string         `json:"password"`
 	Avatar    sql.NullString `json:"avatar"`
 	Role      NullUserRole   `json:"role"`
