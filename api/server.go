@@ -20,16 +20,11 @@ func NewServer(service db.Service) *Server {
 	router.SetTrustedProxies([]string{})
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("user_role", validUserRole)
+		v.RegisterValidation("user_roles", validUserRole)
 	}
 
 	router.POST("/users", server.createUser)
-
-	// router.POST("/accounts", server.createAccount)
-	// router.GET("/accounts/:id", server.getAccount)
-	// router.GET("/accounts", server.listAccounts)
-
-	// router.POST("/transfers", server.createTransfer)
+	// router.GET("/users/:id", server.getUser)
 
 	server.router = router
 	return server
