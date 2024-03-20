@@ -69,3 +69,41 @@ func (server *Server) createUser(ctx *gin.Context) {
 	rsp := newUserResponse(user)
 	ctx.JSON(http.StatusOK, rsp)
 }
+
+type getUserRequest struct {
+	Username string `uri:"username" binding:"required,alphanum"`
+}
+
+func getUserResponse(user db.User) userResponse {
+	return userResponse{
+		Username:  user.Username,
+		Avatar:    user.Avatar.String,
+		Role:      string(user.Role.UserRole),
+		CreatedAt: user.CreatedAt.Time,
+		UpdatedAt: user.UpdatedAt.Time,
+	}
+}
+
+func (server *Server) getUser(ctx *gin.Context) {
+	var req getUserRequest
+
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := server.service.GetUser(ctx, req.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := getUserResponse(user)
+
+	ctx.JSON(http.StatusOK, rsp)
+}
