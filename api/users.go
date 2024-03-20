@@ -74,16 +74,6 @@ type getUserRequest struct {
 	Username string `uri:"username" binding:"required,alphanum"`
 }
 
-func getUserResponse(user db.User) userResponse {
-	return userResponse{
-		Username:  user.Username,
-		Avatar:    user.Avatar.String,
-		Role:      string(user.Role.UserRole),
-		CreatedAt: user.CreatedAt.Time,
-		UpdatedAt: user.UpdatedAt.Time,
-	}
-}
-
 func (server *Server) getUser(ctx *gin.Context) {
 	var req getUserRequest
 
@@ -103,7 +93,7 @@ func (server *Server) getUser(ctx *gin.Context) {
 		return
 	}
 
-	rsp := getUserResponse(user)
+	rsp := newUserResponse(user)
 
 	ctx.JSON(http.StatusOK, rsp)
 }
