@@ -1,7 +1,11 @@
 package api
 
 import (
+	"fmt"
+
 	db "github.com/erodriguez0/leddit-backend/db/sqlc"
+	"github.com/erodriguez0/leddit-backend/token"
+	"github.com/erodriguez0/leddit-backend/util"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
@@ -9,25 +13,45 @@ import (
 
 // Server serves HHTP request for out banking service
 type Server struct {
-	service db.Service
-	router  *gin.Engine
+	service    db.Service
+	router     *gin.Engine
+	tokenMaker token.Maker
+	config     util.Config
 }
 
 // NewServer creates a new HTTP server and setup routing
-func NewServer(service db.Service) *Server {
-	server := &Server{service: service}
+func NewServer(config util.Config, service db.Service) (*Server, error) {
+	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	server := &Server{
+		config:     config,
+		service:    service,
+		tokenMaker: tokenMaker,
+	}
 	router := gin.Default()
 	router.SetTrustedProxies([]string{})
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker %w", err)
+	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("user_roles", validUserRole)
 	}
 
-	router.POST("/users", server.createUser)
-	router.GET("/users/:username", server.getUser)
+	server.setupRouter()
+	return server, nil
+}
+
+func (server *Server) setupRouter() {
+	router := gin.Default()
+
+	api := router.Group("/v1")
+
+	api.POST("/auth/register", server.createUser)
+	api.POST("/auth/login", server.loginUser)
+
+	api.GET("/users/:username", server.getUser)
 
 	server.router = router
-	return server
 }
 
 // Start runs the HTTP server on a specific address
