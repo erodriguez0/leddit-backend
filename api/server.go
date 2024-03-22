@@ -46,7 +46,7 @@ func (server *Server) setupRouter() {
 
 	api := router.Group("/v1")
 
-	api.POST("/auth/register", server.createUser)
+	api.POST("/auth/register", server.registerUser)
 	api.POST("/auth/login", server.loginUser)
 
 	api.GET("/users/:username", server.getUser)
