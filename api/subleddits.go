@@ -15,16 +15,18 @@ type createSubledditRequest struct {
 }
 
 type subledditResponse struct {
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Name      string       `json:"name"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	User      userResponse `json:"user"`
 }
 
-func newSubledditResponse(subleddit *db.Subleddit) subledditResponse {
+func newSubledditResponse(subleddit *db.CreateSubledditRow) subledditResponse {
 	return subledditResponse{
 		Name:      subleddit.Name,
 		CreatedAt: subleddit.CreatedAt.Time,
 		UpdatedAt: subleddit.UpdatedAt.Time,
+		User:      newUserResponse(subleddit.User),
 	}
 }
 
