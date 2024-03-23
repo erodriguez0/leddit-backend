@@ -56,6 +56,11 @@ func (server *Server) setupRouter() {
 		{
 			users.GET("/:username", server.getUser)
 		}
+
+		subleddits := v1.Group("/subleddits").Use(authMiddleware(server.tokenMaker))
+		{
+			subleddits.POST("/", server.createSubleddit)
+		}
 	}
 
 	server.router = router
