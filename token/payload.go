@@ -4,7 +4,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 )
 
@@ -13,11 +12,17 @@ var (
 	ErrExpiredToken = errors.New("token has expired")
 )
 
+type tokenUser struct {
+	Id       uuid.UUID `json:"id"`
+	Username string    `json:"username"`
+}
+
 // Payload contains the payload data of the token
 type Payload struct {
-	ID       uuid.UUID `json:"id"`
-	Username string    `json:"username"`
-	jwt.StandardClaims
+	Id        uuid.UUID `json:"jti"`
+	IssuedAt  int64     `json:"iat"`
+	ExpiresAt int64     `json:"exp"`
+	User      tokenUser `json:"user"`
 }
 
 func NewPayload(username string, duration time.Duration) (*Payload, error) {
@@ -27,11 +32,12 @@ func NewPayload(username string, duration time.Duration) (*Payload, error) {
 	}
 
 	payload := &Payload{
-		ID:       tokenId,
-		Username: username,
-		StandardClaims: jwt.StandardClaims{
-			IssuedAt:  time.Now().Unix(),
-			ExpiresAt: time.Now().Add(duration).Unix(),
+		Id:        tokenId,
+		IssuedAt:  time.Now().Unix(),
+		ExpiresAt: time.Now().Add(duration).Unix(),
+		User: tokenUser{
+			Id:       tokenId,
+			Username: username,
 		},
 	}
 
@@ -40,7 +46,7 @@ func NewPayload(username string, duration time.Duration) (*Payload, error) {
 
 // Valid checks if the token payload is valid
 func (payload *Payload) Valid() error {
-	if time.Now().After(time.Unix(payload.StandardClaims.ExpiresAt, 0)) {
+	if time.Now().After(time.Unix(payload.ExpiresAt, 0)) {
 		return ErrExpiredToken
 	}
 

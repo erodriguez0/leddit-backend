@@ -9,13 +9,6 @@ import (
 )
 
 type Querier interface {
-	// -- name: CreateSubleddit :one
-	// INSERT INTO "subleddits" (
-	//     name,
-	//     user_id
-	// ) VALUES (
-	//     $1, $2
-	// ) RETURNING *;
 	CreateSubleddit(ctx context.Context, arg CreateSubledditParams) (CreateSubledditRow, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteAccount(ctx context.Context, username string) error

@@ -13,7 +13,6 @@ import (
 )
 
 const createSubleddit = `-- name: CreateSubleddit :one
-
 WITH Subleddit AS (
     INSERT INTO "subleddits" (
         name,
@@ -38,17 +37,6 @@ type CreateSubledditRow struct {
 	User      User          `json:"user"`
 }
 
-// -- name: CreateSubleddit :one
-// INSERT INTO "subleddits" (
-//
-//	name,
-//	user_id
-//
-// ) VALUES (
-//
-//	$1, $2
-//
-// ) RETURNING *;
 func (q *Queries) CreateSubleddit(ctx context.Context, arg CreateSubledditParams) (CreateSubledditRow, error) {
 	row := q.db.QueryRowContext(ctx, createSubleddit, arg.Name, arg.UserID)
 	var i CreateSubledditRow

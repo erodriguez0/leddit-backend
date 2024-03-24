@@ -1,11 +1,3 @@
--- -- name: CreateSubleddit :one
--- INSERT INTO "subleddits" (
---     name,
---     user_id
--- ) VALUES (
---     $1, $2
--- ) RETURNING *;
-
 -- name: CreateSubleddit :one
 WITH Subleddit AS (
     INSERT INTO "subleddits" (

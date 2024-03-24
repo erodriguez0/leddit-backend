@@ -5,13 +5,13 @@ import (
 	"time"
 
 	db "github.com/erodriguez0/leddit-backend/db/sqlc"
+	"github.com/erodriguez0/leddit-backend/token"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 type createSubledditRequest struct {
-	Name   string    `json:"name"`
-	UserId uuid.UUID `json:"user_id"`
+	Name string `json:"name"`
 }
 
 type subledditResponse struct {
@@ -37,12 +37,12 @@ func (server *Server) createSubleddit(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.CreateSubledditParams{
 		Name:   req.Name,
-		UserID: uuid.NullUUID{UUID: req.UserId, Valid: true},
+		UserID: uuid.NullUUID{UUID: authPayload.User.Id, Valid: false},
 	}
 
-	// TODO: Check authorization header
 	subleddit, err := server.service.CreateSubleddit(ctx, arg)
 	if err != nil {
 		if db.ErrorCode(err) == db.UniqueViolation {

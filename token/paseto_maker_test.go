@@ -26,8 +26,8 @@ func TestPasetoMaker(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, payload)
 
-	require.NotZero(t, payload.ID)
-	require.Equal(t, username, payload.Username)
+	require.NotZero(t, payload.User.Id)
+	require.Equal(t, username, payload.User.Username)
 	require.WithinDuration(t, issuedAt, time.Unix(payload.IssuedAt, 0), time.Second)
 	require.WithinDuration(t, expiresAt, time.Unix(payload.ExpiresAt, 0), time.Second)
 }
