@@ -25,6 +25,7 @@ type postSubleddit struct {
 }
 
 type postResponse struct {
+	Id        uuid.UUID     `json:"id"`
 	Title     string        `json:"title"`
 	Url       string        `json:"url"`
 	Body      string        `json:"body"`
@@ -36,6 +37,7 @@ type postResponse struct {
 
 func newPostResposne(post *db.CreatePostRow) postResponse {
 	return postResponse{
+		Id:        post.ID,
 		Title:     post.Title,
 		Url:       post.Url.String,
 		Body:      post.Body.String,
