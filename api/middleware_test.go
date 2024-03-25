@@ -9,6 +9,7 @@ import (
 
 	"github.com/erodriguez0/leddit-backend/token"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -20,7 +21,10 @@ func addAuthorization(
 	username string,
 	duration time.Duration,
 ) {
-	token, err := tokenMaker.CreateToken(username, duration)
+	uuid, err := uuid.NewRandom()
+	require.NoError(t, err)
+
+	token, err := tokenMaker.CreateToken(uuid, username, duration)
 	require.NoError(t, err)
 
 	authorizationHeader := fmt.Sprintf("%s %s", authorizationType, token)

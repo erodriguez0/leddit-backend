@@ -38,9 +38,13 @@ func (server *Server) createSubleddit(ctx *gin.Context) {
 	}
 
 	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	// ctx.JSON(http.StatusOK, authPayload.User.Id)
+	// return
+
 	arg := db.CreateSubledditParams{
 		Name:   req.Name,
-		UserID: uuid.NullUUID{UUID: authPayload.User.Id, Valid: false},
+		UserID: uuid.NullUUID{UUID: authPayload.User.Id, Valid: true},
 	}
 
 	subleddit, err := server.service.CreateSubleddit(ctx, arg)

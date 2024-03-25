@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/erodriguez0/leddit-backend/util"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,7 +19,10 @@ func TestPasetoMaker(t *testing.T) {
 	issuedAt := time.Now()
 	expiresAt := issuedAt.Add(duration)
 
-	token, err := maker.CreateToken(username, duration)
+	uuid, err := uuid.NewRandom()
+	require.NoError(t, err)
+
+	token, err := maker.CreateToken(uuid, username, duration)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 
@@ -36,7 +40,10 @@ func TestExpiredPasetoToken(t *testing.T) {
 	maker, err := NewPasetoMaker(util.RandomString(32))
 	require.NoError(t, err)
 
-	token, err := maker.CreateToken(util.RandomString(10), -time.Minute)
+	uuid, err := uuid.NewRandom()
+	require.NoError(t, err)
+
+	token, err := maker.CreateToken(uuid, util.RandomString(10), -time.Minute)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 
