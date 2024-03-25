@@ -12,10 +12,10 @@ import (
 )
 
 type createPostRequest struct {
-	Title         string         `json:"title"`
-	Url           sql.NullString `json:"url"`
-	Body          sql.NullString `json:"body"`
-	SubledditName sql.NullString `json:"subleddit_name"`
+	Title         string `json:"title"`
+	Url           string `json:"url"`
+	Body          string `json:"body"`
+	SubledditName string `json:"subleddit_name"`
 }
 
 type postSubleddit struct {
@@ -25,20 +25,20 @@ type postSubleddit struct {
 }
 
 type postResponse struct {
-	Title     string         `json:"title"`
-	Url       sql.NullString `json:"url"`
-	Body      sql.NullString `json:"body"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	Subleddit postSubleddit  `json:"subleddit"`
-	User      userResponse   `json:"user"`
+	Title     string        `json:"title"`
+	Url       string        `json:"url"`
+	Body      string        `json:"body"`
+	CreatedAt time.Time     `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
+	Subleddit postSubleddit `json:"subleddit"`
+	User      userResponse  `json:"user"`
 }
 
 func newPostResposne(post *db.CreatePostRow) postResponse {
 	return postResponse{
 		Title:     post.Title,
-		Url:       post.Url,
-		Body:      post.Body,
+		Url:       post.Url.String,
+		Body:      post.Body.String,
 		CreatedAt: post.CreatedAt.Time,
 		UpdatedAt: post.UpdatedAt.Time,
 		Subleddit: postSubleddit{
@@ -52,7 +52,6 @@ func newPostResposne(post *db.CreatePostRow) postResponse {
 
 func (server *Server) createPost(ctx *gin.Context) {
 	var req createPostRequest
-
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -60,7 +59,7 @@ func (server *Server) createPost(ctx *gin.Context) {
 
 	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
-	subleddit, err := server.service.GetSubleddit(ctx, req.SubledditName.String)
+	subleddit, err := server.service.GetSubleddit(ctx, req.SubledditName)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -72,8 +71,8 @@ func (server *Server) createPost(ctx *gin.Context) {
 
 	arg := db.CreatePostParams{
 		Title:       req.Title,
-		Url:         req.Url,
-		Body:        req.Body,
+		Url:         sql.NullString{String: req.Url, Valid: true},
+		Body:        sql.NullString{String: req.Body, Valid: true},
 		SubledditID: uuid.NullUUID{UUID: subleddit.ID, Valid: true},
 		UserID:      uuid.NullUUID{UUID: authPayload.User.Id, Valid: true},
 	}

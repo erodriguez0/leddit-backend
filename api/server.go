@@ -54,18 +54,18 @@ func (server *Server) setupRouter() {
 
 		users := v1.Group("/users")
 		{
-			users.GET("/:username", server.getUser).Use(authMiddleware(server.tokenMaker))
+			users.GET("/:username", server.getUser)
 		}
 
 		subleddits := v1.Group("/subleddits")
 		{
-			subleddits.POST("/", server.createSubleddit)
-			subleddits.GET("/:name", server.getSubleddit).Use(authMiddleware(server.tokenMaker))
+			subleddits.POST("/", authMiddleware(server.tokenMaker), server.createSubleddit)
+			subleddits.GET("/:name", server.getSubleddit)
 		}
 
 		posts := v1.Group("/posts")
 		{
-			posts.POST("/", server.createPost).Use(authMiddleware(server.tokenMaker))
+			posts.POST("/", authMiddleware(server.tokenMaker), server.createPost)
 		}
 	}
 
