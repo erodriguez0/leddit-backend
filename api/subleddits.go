@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 )
 
 type createSubledditRequest struct {
-	Name string `json:"name"`
+	Name string `uri:"name" binding:"required,alphanum"`
 }
 
 type subledditResponse struct {
@@ -58,5 +59,49 @@ func (server *Server) createSubleddit(ctx *gin.Context) {
 	}
 
 	rsp := newSubledditResponse(&subleddit)
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+type getSubledditRequest struct {
+	Name string `uri:"name" binding:"required,alphanum"`
+}
+
+// TODO: Extend to include posts
+type getSubledditResponse struct {
+	Name      string       `json:"name"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	User      userResponse `json:"user"`
+}
+
+func newGetSubledditResponse(subleddit *db.GetSubledditRow) getSubledditResponse {
+	return getSubledditResponse{
+		Name:      subleddit.Name,
+		CreatedAt: subleddit.CreatedAt.Time,
+		UpdatedAt: subleddit.UpdatedAt.Time,
+		User:      newUserResponse(subleddit.User),
+	}
+}
+
+func (server *Server) getSubleddit(ctx *gin.Context) {
+	var req getSubledditRequest
+
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	subleddit, err := server.service.GetSubleddit(ctx, req.Name)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := newGetSubledditResponse(&subleddit)
+
 	ctx.JSON(http.StatusOK, rsp)
 }

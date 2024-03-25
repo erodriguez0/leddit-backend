@@ -9,10 +9,12 @@ import (
 )
 
 type Querier interface {
+	CreatePost(ctx context.Context, arg CreatePostParams) (CreatePostRow, error)
 	CreateSubleddit(ctx context.Context, arg CreateSubledditParams) (CreateSubledditRow, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteAccount(ctx context.Context, username string) error
 	DeleteSubleddit(ctx context.Context, name string) error
+	GetSubleddit(ctx context.Context, name string) (GetSubledditRow, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	GetUserForUpdate(ctx context.Context, username string) (User, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
